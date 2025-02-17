@@ -6,6 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Tizimga kirganligini tekshirish
+        document.addEventListener('DOMContentLoaded', function () {
+            const loggedIn = localStorage.getItem("loggedIn");
+
+            // Agar foydalanuvchi tizimga kirgan bo'lmasa, login sahifasiga yo'naltiramiz
+            if (loggedIn !== "true") {
+                window.location.href = "login.html"; // login sahifasiga yo'naltirish
+            }
+        });
+    </script>
 </head>
 
 <body class="bg-gray-100">
