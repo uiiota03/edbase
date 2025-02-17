@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Navbar at the top -->
+    <nav class="bg-white shadow-md p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-600">Student Panel</h1>
+            <button onclick="logout()" class="text-red-600 hover:text-red-700">Chiqish</button>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <!-- Sidebar (Darslar-related sections on the left) -->
+        <div class="w-64 bg-white shadow-md p-4 space-y-6 mt-6">
+            <h2 class="text-xl font-bold text-blue-600">Darslar</h2>
+            <ul class="space-y-4">
+                <li>
+                    <button onclick="showSection('lessons', this)"
+                        class="w-full text-left text-blue-600 hover:text-blue-700">
+                        Darslar Jadvali
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('materials', this)"
+                        class="w-full text-left text-blue-600 hover:text-blue-700">
+                        Dars Materiallari
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('tasks', this)"
+                        class="w-full text-left text-blue-600 hover:text-blue-700">
+                        Uy Vazifalari
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('forum', this)"
+                        class="w-full text-left text-blue-600 hover:text-blue-700">
+                        Forum
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('studentStats', this)"
+                        class="w-full text-left text-blue-600 hover:text-blue-700">
+                        O'quvchi Statistikasi
+                    </button>
+                </li>
+                <li>
+                    <button onclick="showSection('studentMotivation', this)"
+                        class="w-full text-left text-blue-600 hover:text-blue-700">
+                        O'quvchilar Motivatsiyasi
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+
+        <!-- Main Content Area (where sections will display) -->
+        <div class="flex-1 p-6 mt-6">
+            <!-- Darslar Jadvali -->
+            <section class="mb-6 hidden" id="lessonsSection">
+                <h2 class="text-2xl font-bold mb-4">Darslar Jadvali</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th class="text-left py-2">Dars Nomi</th>
+                                <th class="text-left py-2">Sana</th>
+                                <th class="text-left py-2">Hafta Kuni</th>
+                                <th class="text-left py-2">Vaqti</th>
+                                <th class="text-left py-2">Holati</th>
+                                <th class="text-left py-2">Link</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lessonTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Dars Materiallari -->
+            <section class="mb-6 hidden" id="materialsSection">
+                <h2 class="text-2xl font-bold mb-4">Dars Materiallari</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md" id="materials"></div>
+            </section>
+
+            <!-- Uy Vazifalari -->
+            <section class="mb-6 hidden" id="tasksSection">
+                <h2 class="text-2xl font-bold mb-4">Uy Vazifalari</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <select id="subjectSelect" class="w-full p-2 border rounded-lg mb-4" onchange="loadTasks()">
+                        <option value="">Fan tanlang</option>
+                        <option value="Matematika">Matematika</option>
+                        <option value="Fizika">Fizika</option>
+                    </select>
+                    <div id="tasks"></div>
+                </div>
+            </section>
+
+            <!-- Forum / Chat -->
+            <section class="mb-6 hidden" id="forumSection">
+                <h2 class="text-2xl font-bold mb-4">Forum</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <textarea id="chatInput" class="w-full px-4 py-2 border rounded-lg"
+                        placeholder="Savol yoki fikr yozing..."></textarea>
+                    <button onclick="sendMessage()"
+                        class="mt-2 px-6 py-3 bg-blue-600 text-white rounded-lg">Yuborish</button>
+                    <div id="chatMessages" class="mt-4"></div>
+                </div>
+            </section>
+
+            <!-- O'quvchi Statistikasi Section -->
+            <section class="mb-6 hidden" id="studentStatsSection">
+                <h2 class="text-2xl font-bold mb-4">O'quvchi Statistikasi</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-2">Darslar Va Qatnashganlik</h3>
+                    <table class="w-full mb-4">
+                        <thead>
+                            <tr>
+                                <th class="text-left py-2">Dars Nomi</th>
+                                <th class="text-left py-2">Qatnashganlik</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTable">
+                            <!-- Darslar va qatnashganlik bo'limi -->
+                        </tbody>
+                    </table>
+
+                    <h3 class="text-xl font-semibold mb-2">Vazifalar Va Baholar</h3>
+                    <table class="w-full mb-4">
+                        <thead>
+                            <tr>
+                                <th class="text-left py-2">Vazifa</th>
+                                <th class="text-left py-2">Baholar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasksTable">
+                            <!-- Vazifalar va baholar -->
+                        </tbody>
+                    </table>
+
+                    <h3 class="text-xl font-semibold mb-2">O'sish Tendensiyasi</h3>
+                    <div id="growthTrend" class="text-lg">
+                        <!-- O'sish tendensiyasi -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- O'quvchilar Motivatsiyasi Section -->
+            <section class="mb-6 hidden" id="studentMotivationSection">
+                <h2 class="text-2xl font-bold mb-4">O'quvchilar Motivatsiyasi</h2>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-2">O'qib Turgan O'quvchilar</h3>
+                    <table class="w-full mb-4">
+                        <thead>
+                            <tr>
+                                <th class="text-left py-2">Ism</th>
+                                <th class="text-left py-2">O'sish</th>
+                            </tr>
+                        </thead>
+                        <tbody id="motivatedStudentsList">
+                            <!-- O'qib turgan o'quvchilar ro'yxati -->
+                        </tbody>
+                    </table>
+
+                    <h3 class="text-xl font-semibold mb-2">O'quvchilar O'rtasidagi O'sish Tendensiyasi</h3>
+                    <div id="growthComparison" class="text-lg">
+                        <!-- O'quvchilar o'rtasidagi o'sish tendensiyasi -->
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem("loggedIn");
+            window.location.href = "index.html";
+        }
+
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => section.classList.add('hidden'));
+
+            // Show the selected section
+            const selectedSection = document.getElementById(sectionId + "Section");
+            selectedSection.classList.remove('hidden');
+
+            // Load data for the section if needed
+            if (sectionId === "lessons") loadLessons();
+            if (sectionId === "materials") loadMaterials();
+            if (sectionId === "tasks") loadTasks();
+            if (sectionId === "forum") loadForum();
+        }
+
+        let isLoaded = false; // Jadval bir marta yuklanishi uchun flag
+
+        function loadLessons() {
+            // Agar darslar jadvali allaqachon yuklangan bo'lsa, yana yuklamaymiz
+            if (isLoaded) return;
+
+            const lessons = [
+                { name: "Matematika", date: "2025-02-18", time: "9:00 - 10:30", status: "O'tkazilgan", link: "https://zoom.us/j/1234567890" },
+                { name: "Fizika", date: "2025-02-19", time: "10:45 - 12:15", status: "Keyinroq", link: "" },
+                { name: "Kimyo", date: "2025-02-20", time: "14:00 - 15:30", status: "Bekor qilingan", link: "" },
+                { name: "Biologiya", date: "2025-02-21", time: "15:45 - 17:15", status: "O'tkazilgan", link: "https://meet.google.com/xyz-123-abc" },
+                { name: "Ingliz Tili", date: "2025-02-22", time: "17:30 - 19:00", status: "Keyinroq", link: "" },
+            ];
+
+            const lessonTable = document.getElementById("lessonTable");
+
+            lessons.forEach(lesson => {
+                // Sana va hafta kunini hisoblash
+                const lessonDate = new Date(lesson.date);
+                const dayOfWeek = lessonDate.toLocaleString('uz-UZ', { weekday: 'long' }); // Hafta kunini olish
+                const formattedDate = lessonDate.toLocaleDateString('uz-UZ'); // Sana formatlash
+
+                // Linkni ko'rsatish
+                let linkContent = lesson.link ? `<a href="${lesson.link}" target="_blank" class="text-blue-500 hover:underline">Ulanish</a>` : "N/A";
+
+                // Holatga qarab ranglarni tanlash
+                let statusClass = "";
+                if (lesson.status === "O'tkazilgan") {
+                    statusClass = "text-green-800 font-semibold"; // Yashil rang
+                } else if (lesson.status === "Keyinroq") {
+                    statusClass = "text-yellow-800 font-semibold"; // Sariq rang
+                } else if (lesson.status === "Bekor qilingan") {
+                    statusClass = "text-red-800 font-semibold"; // Qizil rang
+                }
+
+                // Dars nomi uchun rang qo'shish
+                const lessonNameClass = "text-blue-600 font-semibold";
+
+                const row = `<tr>
+            <td class="py-2 ${lessonNameClass}">${lesson.name}</td>
+            <td class="py-2">${formattedDate}</td>
+            <td class="py-2">${dayOfWeek}</td>
+            <td class="py-2">${lesson.time}</td>
+            <td class="py-2 ${statusClass}">${lesson.status}</td>
+            <td class="py-2">${linkContent}</td>
+        </tr>`;
+
+                lessonTable.innerHTML += row;
+            });
+
+            isLoaded = true; // Darslar jadvali bir marta yuklandi, flagni o'zgartiramiz
+        }
+
+        // Sahifa yuklanganda darslar jadvalini yuklash
+        window.onload = function () {
+            showSection('lessons'); // Default to showing the lessons section
+        };
+
+
+        // Example Data: Dars Materiallari
+        function loadMaterials() {
+            const materials = [
+                { title: "Matematika - Algebra", link: "#", description: "Algebra darsini ko'rish" },
+                { title: "Fizika - Kinetika", link: "#", description: "Kinetika bo'yicha material" },
+                { title: "Ingliz tili - Grammatika", link: "#", description: "Ingliz grammatikasi" }
+            ];
+
+            const materialsDiv = document.getElementById("materials");
+            materialsDiv.innerHTML = "";  // Clear previous content
+
+            materials.forEach(material => {
+                const item = `<div class="mb-4">
+                    <a href="${material.link}" class="text-blue-600 hover:text-blue-800 text-xl">${material.title}</a>
+                    <p class="text-gray-600">${material.description}</p>
+                </div>`;
+                materialsDiv.innerHTML += item;
+            });
+        }
+
+        // Example Data: Tasks (Uy Vazifalari)
+        function loadTasks() {
+            const selectedSubject = document.getElementById("subjectSelect").value;
+            const tasksDiv = document.getElementById("tasks");
+
+            // Sample tasks for selected subject
+            const tasks = {
+                "Matematika": ["Vazifa 1: 1-dars", "Vazifa 2: 2-dars"],
+                "Fizika": ["Vazifa 1: 1-dars", "Vazifa 2: 2-dars"]
+            };
+
+            tasksDiv.innerHTML = "";  // Clear previous tasks
+
+            if (tasks[selectedSubject]) {
+                tasks[selectedSubject].forEach(task => {
+                    const taskItem = `<div class="mb-2">${task}</div>`;
+                    tasksDiv.innerHTML += taskItem;
+                });
+            } else {
+                tasksDiv.innerHTML = "<p class='text-gray-500'>Fan tanlanmadi.</p>";
+            }
+        }
+
+        // Example Data: Forum (Chat)
+        function loadForum() {
+            const chatMessages = [
+                { user: "Ali", message: "Matematika darsini qanday o'qish kerak?" },
+                { user: "Fatima", message: "Men ham shu savolni so'rayapman!" }
+            ];
+
+            const chatMessagesDiv = document.getElementById("chatMessages");
+            chatMessagesDiv.innerHTML = "";  // Clear previous messages
+
+            chatMessages.forEach(msg => {
+                const messageItem = `<div class="mb-2">
+                    <strong>${msg.user}:</strong> ${msg.message}
+                </div>`;
+                chatMessagesDiv.innerHTML += messageItem;
+            });
+        }
+
+        // Example Data: O'quvchi statistikasi
+        function loadStudentStats() {
+            // Darslar va qatnashganlik
+            const attendance = [
+                { subject: "Matematika", attended: "Ha" },
+                { subject: "Fizika", attended: "Yo'q" }
+            ];
+            const attendanceTable = document.getElementById("attendanceTable");
+            attendance.forEach(item => {
+                const row = `<tr>
+                    <td class="py-2">${item.subject}</td>
+                    <td class="py-2">${item.attended}</td>
+                </tr>`;
+                attendanceTable.innerHTML += row;
+            });
+
+            // Vazifalar va baholar
+            const tasks = [
+                { task: "Matematika vazifasi", grade: "A" },
+                { task: "Fizika vazifasi", grade: "B" }
+            ];
+            const tasksTable = document.getElementById("tasksTable");
+            tasks.forEach(item => {
+                const row = `<tr>
+                    <td class="py-2">${item.task}</td>
+                    <td class="py-2">${item.grade}</td>
+                </tr>`;
+                tasksTable.innerHTML += row;
+            });
+
+            // O'sish tendensiyasi (Baholarga asoslangan)
+            const grades = ["A", "B", "B", "A", "A"];
+            const growth = calculateGrowth(grades);
+            document.getElementById("growthTrend").innerText = `O'sish: ${growth}%`;
+        }
+
+        function calculateGrowth(grades) {
+            let gradeCount = { "A": 0, "B": 0, "C": 0 };
+            grades.forEach(grade => gradeCount[grade] = (gradeCount[grade] || 0) + 1);
+
+            let totalGrades = grades.length;
+            let growth = ((gradeCount["A"] / totalGrades) * 100).toFixed(2);
+            return growth;
+        }
+
+        window.onload = function () {
+            loadStudentStats();  // Load stats by default when section is shown
+            showSection('lessons'); // Default to showing the lessons section
+        };
+
+        // Example Data: O'quvchilar va ularning o'sish tendensiyasi
+        function loadMotivatedStudents() {
+            const students = [
+                { name: "Ali", growth: "20%" },
+                { name: "Fatima", growth: "15%" },
+                { name: "Zuhra", growth: "30%" },
+                { name: "Diyor", growth: "25%" }
+            ];
+
+            // Sort students by their growth (highest to lowest)
+            students.sort((a, b) => parseFloat(b.growth) - parseFloat(a.growth));
+
+            const motivatedStudentsList = document.getElementById("motivatedStudentsList");
+
+            students.forEach((student, index) => {
+                let medal = ''; // Initialize medal variable
+                if (index === 0) {
+                    medal = '🏆'; // Gold trophy for the top student
+                } else if (index === 1) {
+                    medal = '🥈'; // Silver medal for second
+                } else if (index === 2) {
+                    medal = '🥉'; // Bronze medal for third
+                }
+
+                // Add row for each student
+                const row = `<tr>
+            <td class="py-2">${medal} ${student.name}</td>
+            <td class="py-2">${student.growth}</td>
+        </tr>`;
+                motivatedStudentsList.innerHTML += row;
+            });
+
+            // O'quvchilar o'rtasidagi o'sish tendensiyasini ko'rsatish
+            const averageGrowth = calculateAverageGrowth(students);
+            document.getElementById("growthComparison").innerHTML = `O'quvchilar o'rtasidagi o'sish tendensiyasi: ${averageGrowth}%`;
+        }
+
+        function calculateAverageGrowth(students) {
+            const totalGrowth = students.reduce((sum, student) => sum + parseFloat(student.growth), 0);
+            const averageGrowth = (totalGrowth / students.length).toFixed(2);
+            return averageGrowth;
+        }
+
+        window.onload = function () {
+            loadMotivatedStudents(); // Load motivated students by default
+            showSection('lessons'); // Default to showing the lessons section
+        };
+
+    </script>
+</body>
+
+</html>

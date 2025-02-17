@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <section id="statsSection">
+        <h2 class="text-2xl font-bold mb-4">O'quvchi Statistikasi</h2>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-2">Darslar Va Qatnashganlik</h3>
+            <table class="w-full mb-4" id="statsTable">
+                <thead>
+                    <tr>
+                        <th class="text-left py-2">Dars Nomi</th>
+                        <th class="text-left py-2">Qatnashganlik</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- JS orqali statistika ma'lumotlari qo'shiladi -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+    
+    <script>
+        const statsData = [
+            { lesson: "Matematika", attendance: "O'tkazilgan" },
+            { lesson: "Fizika", attendance: "Bekor qilindi" }
+        ];
+    
+        const statsTable = document.getElementById('statsTable').getElementsByTagName('tbody')[0];
+    
+        statsData.forEach(stat => {
+            const row = statsTable.insertRow();
+            const lessonCell = row.insertCell(0);
+            const attendanceCell = row.insertCell(1);
+            
+            lessonCell.textContent = stat.lesson;
+            attendanceCell.textContent = stat.attendance;
+            attendanceCell.classList.add(stat.attendance === 'O\'tkazilgan' ? 'text-green-800' : 'text-red-600');
+        });
+    </script>
+    
+</body>
+</html>

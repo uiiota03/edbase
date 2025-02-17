@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-600">Admin Panel</h1>
+            <button onclick="logout()" class="text-red-600 hover:text-red-700">Chiqish</button>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-6">
+        <!-- Darslarni boshqarish -->
+        <section class="mb-6">
+            <h2 class="text-2xl font-bold mb-4">Darslarni boshqarish</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <input type="text" id="lessonName" placeholder="Dars nomi" class="w-full px-4 py-2 mb-2 border rounded-lg">
+                <input type="time" id="lessonTime" class="w-full px-4 py-2 mb-2 border rounded-lg">
+                <input type="text" id="lessonLink" placeholder="Zoom/Meet linki" class="w-full px-4 py-2 mb-2 border rounded-lg">
+                <button onclick="addLesson()" class="w-full px-6 py-3 bg-blue-600 text-white rounded-lg">Dars qo‘shish</button>
+            </div>
+        </section>
+
+        <!-- O‘quvchilarni boshqarish -->
+        <section class="mb-6">
+            <h2 class="text-2xl font-bold mb-4">O‘quvchilar ro‘yxati</h2>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <ul id="studentsList" class="list-disc pl-5">
+                    <li>O‘quvchi 1 <button class="text-red-600 ml-2" onclick="removeStudent(this)">❌</button></li>
+                    <li>O‘quvchi 2 <button class="text-red-600 ml-2" onclick="removeStudent(this)">❌</button></li>
+                </ul>
+                <input type="text" id="studentName" placeholder="O‘quvchi nomi" class="w-full px-4 py-2 mb-2 border rounded-lg">
+                <button onclick="addStudent()" class="w-full px-6 py-3 bg-green-600 text-white rounded-lg">O‘quvchi qo‘shish</button>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem("loggedIn");
+            window.location.href = "index.html";
+        }
+
+        function addLesson() {
+            const name = document.getElementById("lessonName").value;
+            const time = document.getElementById("lessonTime").value;
+            const link = document.getElementById("lessonLink").value;
+            
+            if (name && time && link) {
+                alert(`Dars qo‘shildi: ${name} (${time})`);
+                document.getElementById("lessonName").value = "";
+                document.getElementById("lessonTime").value = "";
+                document.getElementById("lessonLink").value = "";
+            } else {
+                alert("Barcha maydonlarni to‘ldiring!");
+            }
+        }
+
+        function addStudent() {
+            const name = document.getElementById("studentName").value;
+            if (name) {
+                const ul = document.getElementById("studentsList");
+                const li = document.createElement("li");
+                li.innerHTML = `${name} <button class='text-red-600 ml-2' onclick='removeStudent(this)'>❌</button>`;
+                ul.appendChild(li);
+                document.getElementById("studentName").value = "";
+            }
+        }
+
+        function removeStudent(button) {
+            button.parentElement.remove();
+        }
+    </script>
+</body>
+
+</html>

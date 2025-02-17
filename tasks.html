@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Tasks Section</title>
+    <style>
+        .past-deadline {
+            color: red;
+            font-weight: bold;
+        }
+        .task-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            background-color: #f7fafc;
+        }
+        .task-card.completed {
+            background-color: #f0fff4;
+        }
+        .task-card.past-deadline {
+            background-color: #fff5f5;
+        }
+    </style>
+</head>
+<body>
+    <section id="tasksSection" class="p-6 bg-gray-50 rounded-lg shadow-sm">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">📝 Uy Vazifalari</h2>
+        <div class="flex flex-col md:flex-row gap-6 mb-8">
+            <!-- Fanlarni tanlash -->
+            <div class="w-full md:w-1/4">
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">📂 Fanlar</h3>
+                <select id="subjectSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">Fan tanlang</option>
+                    <option value="Matematika">Matematika</option>
+                    <option value="Fizika">Fizika</option>
+                    <option value="Ingliz Tili">Ingliz Tili</option>
+                </select>
+            </div>
+            <!-- Darslarni tanlash -->
+            <div class="w-full md:w-1/4">
+                <h3 class="text-lg font-semibold mb-3 text-gray-700">📂 Darslar</h3>
+                <select id="lessonSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" disabled>
+                    <option value="">Dars tanlang</option>
+                </select>
+            </div>
+            <!-- Filtrlash va qidirish -->
+            <div class="flex-1">
+                <div class="mb-6">
+                    <label for="searchTask" class="block text-sm font-medium mb-2 text-gray-600">🔍 Vazifalarni qidirish:</label>
+                    <input type="text" id="searchTask" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                           placeholder="Vazifa nomini kiriting...">
+                </div>
+                <div class="flex gap-4 mb-6">
+                    <button id="filterAll" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Hammasi</button>
+                    <button id="filterCompleted" class="bg-green-500 text-white px-4 py-2 rounded-lg">Bajarilgan</button>
+                    <button id="filterPending" class="bg-red-500 text-white px-4 py-2 rounded-lg">Bajarilmagan</button>
+                </div>
+            </div>
+        </div>
+        <!-- Vazifalar ro'yxati -->
+        <div id="tasks" class="space-y-4"></div>
+    </section>
+
+    <script>
+
+    </script>
+</body>
+</html>

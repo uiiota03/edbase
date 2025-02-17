@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-md p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-600">Student Panel</h1>
+            <button onclick="logout()" class="text-red-600 hover:text-red-700">Chiqish</button>
+        </div>
+    </nav>
+
+    <div class="flex">
+        <div class="w-64 bg-white shadow-md p-4 space-y-6 mt-6">
+            <h2 class="text-xl font-bold text-blue-600">Darslar</h2>
+            <ul class="space-y-4">
+                <li>
+                    <button onclick="showSection('lessons')"
+                        class="w-full text-left text-blue-600 hover:text-blue-700">Darslar Jadvali</button>
+                </li>
+                <li>
+                    <button onclick="showSection('materials')"
+                        class="w-full text-left text-blue-600 hover:text-blue-700">Dars Materiallari</button>
+                </li>
+                <li>
+                    <button onclick="showSection('tasks')" class="w-full text-left text-blue-600 hover:text-blue-700">Uy
+                        Vazifalari</button>
+                </li>
+                <li>
+                    <button onclick="showSection('forum')"
+                        class="w-full text-left text-blue-600 hover:text-blue-700">Forum</button>
+                </li>
+                <li>
+                    <button onclick="showSection('stats')"
+                        class="w-full text-left text-blue-600 hover:text-blue-700">O'quvchi Statistikasi</button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content Area (where sections will display) -->
+        <div class="flex-1 p-6 mt-6">
+            <div id="sectionContainer">
+                <!-- Content will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem("loggedIn");
+            window.location.href = "index.html";
+        }
+
+        function showSection(section) {
+            // Clear the section container
+            document.getElementById('sectionContainer').innerHTML = '';
+
+            // Dynamically load the section content
+            fetch(`${section}.html`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sectionContainer').innerHTML = data;
+
+                    // Har bir sectionni yuklaganidan keyin tegishli funksiyani chaqirish
+                    if (section === 'lessons') {
+                        loadLessonsData();
+                    } else if (section === 'materials') {
+                        loadMaterialsData();  // Materiallar uchun
+                    } else if (section === 'tasks') {
+                        loadTasksData();
+                    } else if (section === 'chat') {
+                        loadChatData();
+                    } else if (section === 'stats') {
+                        loadStatsData();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading section:', error);
+                });
+        }
+
+
+    </script>
+    <script src="./lessons.js"></script>
+    <script src="materials.js"></script>
+    <script src="./tasks.js"></script>
+    <script src="./forum.js"></script>
+    <script src="stats.js"></script>
+</body>
+
+</html>
