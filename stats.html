@@ -4,44 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <section id="statsSection">
-        <h2 class="text-2xl font-bold mb-4">O'quvchi Statistikasi</h2>
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold mb-2">Darslar Va Qatnashganlik</h3>
-            <table class="w-full mb-4" id="statsTable">
-                <thead>
-                    <tr>
-                        <th class="text-left py-2">Dars Nomi</th>
-                        <th class="text-left py-2">Qatnashganlik</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- JS orqali statistika ma'lumotlari qo'shiladi -->
-                </tbody>
-            </table>
+    <section id="statsSection" class="container mx-auto p-6">
+        <h2 class="text-2xl font-bold mb-4">📊 O'quvchi Statistikasi</h2>
+    
+        <!-- 🔹 Umumiy Statistika Kartalari -->
+        <div id="courseSummary" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <!-- JS orqali kurslar statistikasi dinamik yuklanadi -->
+        </div>
+    
+        <!-- 🔹 Kurslar bo'yicha batafsil statistika (Drop-down bilan) -->
+        <div id="detailedStats" class="space-y-4">
+            <!-- JS orqali kurs ma'lumotlari yuklanadi -->
         </div>
     </section>
     
-    <script>
-        const statsData = [
-            { lesson: "Matematika", attendance: "O'tkazilgan" },
-            { lesson: "Fizika", attendance: "Bekor qilindi" }
-        ];
-    
-        const statsTable = document.getElementById('statsTable').getElementsByTagName('tbody')[0];
-    
-        statsData.forEach(stat => {
-            const row = statsTable.insertRow();
-            const lessonCell = row.insertCell(0);
-            const attendanceCell = row.insertCell(1);
-            
-            lessonCell.textContent = stat.lesson;
-            attendanceCell.textContent = stat.attendance;
-            attendanceCell.classList.add(stat.attendance === 'O\'tkazilgan' ? 'text-green-800' : 'text-red-600');
-        });
-    </script>
-    
+    <script src="./stats.js"></script>
 </body>
 </html>

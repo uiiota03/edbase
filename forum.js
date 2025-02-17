@@ -1,109 +1,145 @@
-// Chat Section
 function loadChatData() {
     const chatMessagesDiv = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
     const sendButton = document.getElementById('sendButton');
     const usernameInput = document.getElementById('username');
+    const filterButtons = document.querySelectorAll(".category-filter");
 
-    // Make sure the username input exists
-    if (!usernameInput) {
-        console.error("Username input not found!");
+    if (!chatMessagesDiv || !chatInput || !sendButton || !usernameInput) {
+        console.error("Forum elementlari topilmadi!");
         return;
     }
 
     let currentUsername = 'Anonymous';
 
-    // Get stored username from localStorage, if any
+    // Username saqlangan bo'lsa, uni olish
     if (localStorage.getItem('username')) {
         currentUsername = localStorage.getItem('username');
         usernameInput.value = currentUsername;
     }
 
-    // Function to create message elements
-    function createMessageElement(messageText, username) {
+    // Username input o'zgarishini kuzatish
+    usernameInput.addEventListener('input', function () {
+        currentUsername = usernameInput.value.trim();
+        localStorage.setItem('username', currentUsername);
+    });
+
+    // 🟢 Xabar yaratish funksiyasi
+    function createMessageElement(messageText, username, messageType, time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })) {
         const messageElement = document.createElement('div');
-        messageElement.classList.add('p-3', 'bg-gray-100', 'rounded-lg', 'shadow-sm', 'max-w-xs', 'mx-auto');
+        messageElement.classList.add('message', 'p-4', 'bg-gray-100', 'rounded-lg', 'shadow-sm', 'border');
+        messageElement.setAttribute('data-type', messageType);
+
+        let typeColor = 'bg-blue-100 text-blue-800'; // Default - question
+        if (messageType === 'discussion') typeColor = 'bg-purple-100 text-purple-800';
+        else if (messageType === 'reply') typeColor = 'bg-green-100 text-green-800';
+
         messageElement.innerHTML = `
-                    <p><strong>${username}:</strong> ${messageText}</p>
-                    <div class="flex justify-between items-center mt-2">
-                        <button onclick="editMessage(this)" class="text-blue-500 text-sm">Edit</button>
-                        <button onclick="deleteMessage(this)" class="text-red-500 text-sm">Delete</button>
-                    </div>
-                    <div class="text-xs text-gray-500 mt-1">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                `;
+            <div class="flex items-center gap-2 mb-2">
+                <span class="font-bold text-blue-600">@${username}</span>
+                <span class="text-sm text-gray-500">${time}</span>
+                <span class="px-2 py-1 ${typeColor} text-xs rounded">${messageType}</span>
+            </div>
+            <p class="mb-2">${messageText}</p>
+            <div class="flex gap-2 text-sm">
+                <button onclick="editMessage(this)" class="text-blue-500">✏️ Edit</button>
+                <button onclick="deleteMessage(this)" class="text-red-500">🗑 Delete</button>
+            </div>
+        `;
+
         return messageElement;
     }
 
-    // Send message functionality
+    // 🟢 Default xabarlarni qo‘shish funksiyasi
+    function addDefaultMessages() {
+        const defaultMessages = [
+            { username: "student1", time: "18:56", type: "question", text: "Salom, savol bor edi" },
+            { username: "student1", time: "18:57", type: "discussion", text: "Salom, munozaraga nima deysizlar:)" },
+            { username: "student1", time: "18:57", type: "reply", text: "Menda siz uchun javoblar bor))" },
+            { username: "Izzatillo", time: "18:58", type: "discussion", text: "Judayam hursand bo'ldim, rahmat javob uchun))" }
+        ];
+
+        defaultMessages.forEach(msg => {
+            const messageElement = createMessageElement(msg.text, msg.username, msg.type, msg.time);
+            chatMessagesDiv.appendChild(messageElement);
+        });
+    }
+
+    // 🟢 Xabar yuborish funksiyasi
     function sendMessage() {
         const message = chatInput.value.trim();
+        const messageType = document.getElementById("messageType").value;
 
         if (message && currentUsername !== '') {
-            // Create and display new message
-            const messageElement = createMessageElement(message, currentUsername);
+            const messageElement = createMessageElement(message, currentUsername, messageType);
             chatMessagesDiv.appendChild(messageElement);
-
-            // Scroll to the bottom of the chat window
             chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
 
-            // Clear the input field after message is sent
-            chatInput.value = '';
+            chatInput.value = ''; // Inputni tozalash
         }
     }
 
-    // Send message on Enter key press
+    // 🟢 Enter bosilganda xabar yuborish
     chatInput.addEventListener('keydown', function (event) {
         if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault(); // Prevent new line on Enter
+            event.preventDefault();
             sendMessage();
         }
     });
 
-    // Send message on button click
+    // 🟢 Tugmani bosganda xabar yuborish
     sendButton.addEventListener('click', function () {
-        sendMessage(); // Ensure this correctly calls the sendMessage function
+        sendMessage();
     });
 
-    // Edit message functionality
+    // 🟢 Xabarni tahrirlash
     window.editMessage = function (button) {
-        const messageDiv = button.closest('div');
-        const messageText = messageDiv.querySelector('p').textContent.replace(/^.*?: /, ''); // Remove the username part
-        const newMessage = prompt('Edit your message:', messageText);
+        const messageDiv = button.closest('.message');
+        const messageTextElement = messageDiv.querySelector('p');
+        const messageText = messageTextElement.textContent;
+        const newMessage = prompt('Xabaringizni tahrirlang:', messageText);
 
         if (newMessage && newMessage !== messageText) {
-            messageDiv.querySelector('p').textContent = `${currentUsername}: ${newMessage}`;
+            messageTextElement.textContent = newMessage;
         }
     };
 
-    // Delete message functionality
+    // 🟢 Xabarni o‘chirish
     window.deleteMessage = function (button) {
-        const messageDiv = button.closest('div');
+        const messageDiv = button.closest('.message');
         messageDiv.remove();
     };
 
-    // Notification system for new messages
-    let notificationTimeout;
-    function notifyNewMessage() {
-        clearTimeout(notificationTimeout);
-        document.title = "New message in forum!";
-        notificationTimeout = setTimeout(() => {
-            document.title = "Forum"; // Reset title after a while
-        }, 5000);
+    // 🟢 FILTR FUNKSIYASI - Kategoriyalar bo‘yicha xabarlarni saralash
+    function filterMessages(category) {
+        const messages = document.querySelectorAll('.message');
+
+        messages.forEach((message) => {
+            const messageType = message.getAttribute('data-type');
+
+            if (category === "all" || messageType === category) {
+                message.style.display = "block";
+            } else {
+                message.style.display = "none";
+            }
+        });
     }
 
-    // Listen for new messages and show notifications
-    chatMessagesDiv.addEventListener('DOMNodeInserted', function () {
-        notifyNewMessage();
+    // 🟢 Filtr tugmalariga event qo‘shish
+    filterButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            const category = button.getAttribute("data-category");
+            filterMessages(category);
+        });
     });
 
-    // Load stored username
-    usernameInput.addEventListener('input', function () {
-        currentUsername = usernameInput.value.trim();
-        if (currentUsername) {
-            localStorage.setItem('username', currentUsername); // Save username to localStorage
-        }
-    });
+    // 🟢 Default xabarlarni chat yuklanganda qo‘shish
+    addDefaultMessages();
 }
 
-// Initialize the chat when the DOM is loaded
-document.addEventListener('DOMContentLoaded', loadChatData);
+// 🟢 Forum sahifasi yuklanganidan keyin chatni ishga tushirish
+document.addEventListener('DOMContentLoaded', function () {
+    if (document.getElementById('chatMessages')) {
+        loadChatData();
+    }
+});
