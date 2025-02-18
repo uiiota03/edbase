@@ -33,7 +33,7 @@
         }
 
         function logout() {
-            localStorage.clear();
+            // localStorage.clear();
             window.location.href = "index.html";
         }
 
@@ -67,7 +67,7 @@
                 const notificationDateTime = new Date(`${event.date} ${event.time.split('-')[0]}`);
                 notificationDateTime.setMinutes(notificationDateTime.getMinutes() - parseInt(notificationTime));
 
-                const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+                let notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
                 notifications.push({
                     title: event.title,
                     dateTime: notificationDateTime.toISOString()
@@ -92,6 +92,7 @@
             });
             localStorage.setItem('notifications', JSON.stringify(notifications));
         }
+
         function showSection(section, clickedButton) {
             document.getElementById('sectionContainer').innerHTML = '';
             setActiveSection(section);
@@ -110,8 +111,7 @@
                     } else if (section === 'tasks') {
                         loadTasksData();
                     } else if (section === 'forum') {
-                        // Change this line if you're using loadChatData directly
-                        loadForumData(); // or loadChatData() if that's how you've named it
+                        loadForumData(); // Assuming loadForumData calls loadChatData internally
                     } else if (section === 'stats') {
                         loadStatsData();
                     }
@@ -119,7 +119,7 @@
                 .catch(error => {
                     console.error('Error loading section:', error);
                 });
-        }   
+        }
 
         // Assuming lessonsData is defined in lessons.js which is loaded before this script
         function setAttendance(lessonId, canAttend) {
@@ -146,7 +146,7 @@
             const button = document.getElementById(`attendance-${lessonId}`);
             if (button) {
                 button.textContent = attendance.status === 'attending' ? 'Qatnashaman' : 'Qatnashmayman';
-                button.classList = attendance.status === 'attending' ? 'text-green-600 hover:text-green-700' : 'text-red-600 hover:text-red-700';
+                button.className = attendance.status === 'attending' ? 'text-green-600 hover:text-green-700' : 'text-red-600 hover:text-red-700';
                 button.onclick = () => setAttendance(lessonId, attendance.status !== 'attending');
             }
         }
@@ -212,7 +212,7 @@
         </div>
     </div>
 
-    <!-- Ensure lessons.js is loaded before these scripts -->
+    <!-- Ensure all scripts are loaded in the right order -->
     <script src="./lessons.js"></script>
     <script src="./materials.js"></script>
     <script src="./tasks.js"></script>
