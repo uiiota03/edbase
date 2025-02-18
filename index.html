@@ -21,7 +21,7 @@
             if (validCredentials[username] && validCredentials[username] === password) {
                 localStorage.setItem("loggedIn", "true");
                 localStorage.setItem("loggedInUsername", username);
-                window.location.href = username === "admin" ? "admin.html" : "student2.html";
+                window.location.href = username === "admin" ? "./admin/admin.html" : "student2.html";
             } else {
                 alert("Invalid username or password");
             }
