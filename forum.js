@@ -143,3 +143,8 @@ document.addEventListener('DOMContentLoaded', function () {
         loadChatData();
     }
 });
+
+function loadForumData() {
+    console.log('loadForumData is called'); // This should appear in the console if the function is called
+    loadChatData();
+}

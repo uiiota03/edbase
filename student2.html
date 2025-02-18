@@ -6,38 +6,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const loggedIn = localStorage.getItem("loggedIn");
 
             if (loggedIn !== "true") {
-                window.location.href = "https://uiiota03.github.io/edbase/";
+                window.location.href = "index.html";
             }
 
             showSection('lessons');
+            setInterval(checkNotifications, 60000); // Ensure this runs after DOM is ready
         });
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('overlay');
 
-            // Toggle sidebar sliding
             sidebar.classList.toggle('-translate-x-full');
             overlay.classList.toggle('hidden');
 
-            // Sidebar z-index adjustment on mobile when visible
             if (!sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.add('z-50');
             } else {
                 setTimeout(() => sidebar.classList.remove('z-50'), 300);
             }
         }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        function setActiveSection(activeSection) {
+            const buttons = document.querySelectorAll('.sidebar-button');
+            buttons.forEach(button => {
+                button.classList.remove('bg-blue-100', 'font-semibold');
+                if (button.getAttribute('data-section') === activeSection) {
+                    button.classList.add('bg-blue-100', 'font-semibold');
+                }
+            });
+        }
+
+        function addToCalendar(event) {
+            const startDateTime = new Date(`${event.start}`);
+            const endDateTime = new Date(`${event.end}`);
+
+            const calendarEvent = {
+                title: event.title,
+                start: startDateTime.toISOString(),
+                end: endDateTime.toISOString(),
+                description: `Join this session on ${event.platform}`,
+                url: event.url
+            };
+            alert(`Event added to calendar:\n\nTitle: ${calendarEvent.title}\nStart: ${calendarEvent.start}\nEnd: ${calendarEvent.end}\nURL: ${calendarEvent.url}`);
+        }
+
+        function setNotification(event) {
+            const notificationTime = prompt("Set reminder (minutes before):", "15");
+            if (notificationTime !== null && !isNaN(notificationTime)) {
+                const notificationDateTime = new Date(`${event.date} ${event.time.split('-')[0]}`);
+                notificationDateTime.setMinutes(notificationDateTime.getMinutes() - parseInt(notificationTime));
+
+                const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+                notifications.push({
+                    title: event.title,
+                    dateTime: notificationDateTime.toISOString()
+                });
+                localStorage.setItem('notifications', JSON.stringify(notifications));
+
+                alert(`Notification set for ${event.title} at ${notificationDateTime.toLocaleString()}`);
+            } else {
+                alert("Please enter a valid number for the reminder time.");
+            }
+        }
+
+        function checkNotifications() {
+            const now = new Date().getTime();
+            let notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+            notifications = notifications.filter(notification => {
+                if (new Date(notification.dateTime).getTime() <= now) {
+                    alert(`Reminder: ${notification.title}`);
+                    return false; // Remove this notification as it has been triggered
+                }
+                return true;
+            });
+            localStorage.setItem('notifications', JSON.stringify(notifications));
+        }
+        function showSection(section, clickedButton) {
+            document.getElementById('sectionContainer').innerHTML = '';
+            setActiveSection(section);
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+            fetch(`${section}.html`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('sectionContainer').innerHTML = data;
+                    if (section === 'lessons') {
+                        loadLessonsData();
+                    } else if (section === 'materials') {
+                        loadMaterialsData();
+                    } else if (section === 'tasks') {
+                        loadTasksData();
+                    } else if (section === 'forum') {
+                        // Change this line if you're using loadChatData directly
+                        loadForumData(); // or loadChatData() if that's how you've named it
+                    } else if (section === 'stats') {
+                        loadStatsData();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading section:', error);
+                });
+        }   
+
+        // Assuming lessonsData is defined in lessons.js which is loaded before this script
+        function setAttendance(lessonId, canAttend) {
+            const lesson = lessonsData.find(l => l.id === lessonId);
+            if (!lesson) {
+                console.error('Lesson not found:', lessonId);
+                return;
+            }
+            if (canAttend) {
+                lesson.attendance = { status: 'attending', reason: '' };
+            } else {
+                const reason = prompt("Nima uchun qatnasha olmaysiz?");
+                if (reason) {
+                    lesson.attendance = { status: 'notAttending', reason: reason };
+                } else {
+                    alert("Sababni kiritishingiz kerak.");
+                    return;
+                }
+            }
+            updateAttendanceStatus(lessonId, lesson.attendance);
+        }
+
+        function updateAttendanceStatus(lessonId, attendance) {
+            const button = document.getElementById(`attendance-${lessonId}`);
+            if (button) {
+                button.textContent = attendance.status === 'attending' ? 'Qatnashaman' : 'Qatnashmayman';
+                button.classList = attendance.status === 'attending' ? 'text-green-600 hover:text-green-700' : 'text-red-600 hover:text-red-700';
+                button.onclick = () => setAttendance(lessonId, attendance.status !== 'attending');
+            }
+        }
     </script>
 </head>
 
 <body class="bg-gray-100">
-    <!-- Navbar -->
     <nav class="bg-white shadow-md p-4 sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold text-blue-600">Student Panel</h1>
@@ -86,85 +202,22 @@
             </li>
         </ul>
     </div>
-    <!-- Overlay (Mobil menyuni yopish uchun) -->
+
     <div id="overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onclick="toggleSidebar()">
     </div>
 
-    <div class="">
-        <!-- Main Content Area: On desktop, margin-left qo'llaniladi; mobilda margin 0 -->
-        <div class="flex-1 p-6 mt-6 ml-0 md:ml-72">
-            <div id="sectionContainer">
-                <!-- Content will be dynamically loaded here -->
-            </div>
+    <div class="flex-1 p-6 mt-6 ml-0 md:ml-72">
+        <div id="sectionContainer">
+            <!-- Content will be dynamically loaded here -->
         </div>
     </div>
 
-    <script>
-        function logout() {
-            localStorage.removeItem("loggedIn");
-            window.location.href = "index.html";
-        }
-
-        function setActiveSection(activeSection) {
-            const buttons = document.querySelectorAll('.sidebar-button');
-            buttons.forEach(button => {
-                button.classList.remove('bg-blue-100', 'font-semibold');
-                if (button.getAttribute('data-section') === activeSection) {
-                    button.classList.add('bg-blue-100', 'font-semibold');
-                }
-            });
-        }
-
-        function showSection(section, clickedButton) {
-            document.getElementById('sectionContainer').innerHTML = '';
-
-            setActiveSection(section);
-
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            // Hide mobile sidebar after selecting a section
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('hidden');
-
-            fetch(`${section}.html`)
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('sectionContainer').innerHTML = data;
-
-                    if (section === 'forum') {
-                        let oldScript = document.getElementById('forumScript');
-                        if (oldScript) {
-                            oldScript.remove();
-                        }
-
-                        let script = document.createElement('script');
-                        script.src = 'forum.js';
-                        script.id = 'forumScript';
-                        script.onload = function () {
-                            console.log("forum.js yuklandi.");
-                            loadChatData();
-                        };
-                        document.body.appendChild(script);
-                    } else if (section === 'lessons') {
-                        loadLessonsData();
-                    } else if (section === 'materials') {
-                        loadMaterialsData();
-                    } else if (section === 'tasks') {
-                        loadTasksData();
-                    } else if (section === 'stats') {
-                        loadStatsData();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading section:', error);
-                });
-        }
-    </script>
+    <!-- Ensure lessons.js is loaded before these scripts -->
     <script src="./lessons.js"></script>
-    <script src="materials.js"></script>
+    <script src="./materials.js"></script>
     <script src="./tasks.js"></script>
     <script src="./forum.js"></script>
-    <script src="stats.js"></script>
+    <script src="./stats.js"></script>
 </body>
 
 </html>
